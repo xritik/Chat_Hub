@@ -24,7 +24,9 @@ app.use(cors(corsOptions));
 // mongoose.connect('mongodb://localhost:27017/mydb')
 mongoose.connect(mongoURL, {
     useNewUrlParser: true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
+    connectTimeoutMS: 30000, // Timeout in milliseconds
+    socketTimeoutMS: 45000,
 })
     .then(() => console.log('Connected to MongoDB'))
     .catch(err => console.error('Could not connect to MongoDB:', err));
