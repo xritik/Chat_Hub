@@ -9,7 +9,7 @@ const mongoURL = process.env.DB_URL;
 
 // CORS Configuration
 const corsOptions = {
-    origin: 'https://chat-hub-40gr.onrender.com',  // Allow only requests from this origin
+    origin: 'https://chat-hub-1.onrender.com',  // Allow only requests from this origin
     credentials: true,               // Allow credentials (cookies) to be sent
 };
 
