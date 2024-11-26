@@ -13,7 +13,7 @@ const SignUp = ({signupMessage, setLoginUser, navigate}) => {
   // localStorage.removeItem('loginUser')
   const signUp = async () => {
     try{
-      const response = await fetch('http://localhost:8080/signup', {
+      const response = await fetch('https://chat-hub-40gr.onrender.com/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
