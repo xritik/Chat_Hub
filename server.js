@@ -9,7 +9,7 @@ const mongoURL = 'mongodb://localhost:27017/mydb';
 
 // CORS Configuration
 const corsOptions = {
-    origin: 'http://localhost:3000', // Use HTTP for localhost
+    origin: 'http://portal.vikasweb.xyz:3000', // Use HTTP for localhost
     credentials: true,               // Allow credentials (cookies)
 };
 
