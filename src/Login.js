@@ -16,7 +16,7 @@ const Login = ({ HOST, signupMessage, navigate, setLoginUser }) => {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({ username, password }),
-            credentials: 'include',  // Include cookies (session)
+            // credentials: 'include',  // Include cookies (session)
         });
 
         const data = await response.json();

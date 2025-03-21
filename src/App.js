@@ -11,7 +11,7 @@ function App() {
   const [signupMessage, setSignupMessage] = useState('')
   const [loginUser, setLoginUser] = useState(localStorage.getItem('loginUser') || '');
   // const HOST = 'portal.vikasweb.xyz';
-  const HOST = 'http://localhost:8081';
+  const HOST = 'http://localhost:8080';
   console.log(loginUser);
 
 
