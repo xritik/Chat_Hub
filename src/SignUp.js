@@ -1,7 +1,7 @@
 import React, {useState} from 'react'
 import { Link } from 'react-router-dom';
 
-const SignUp = ({signupMessage, setLoginUser, navigate}) => {
+const SignUp = ({ HOST, signupMessage, setLoginUser, navigate}) => {
   const [showPassword, setShowPassword] = useState(false);
 
   const [fullname, setFullname] = useState('');
@@ -13,7 +13,7 @@ const SignUp = ({signupMessage, setLoginUser, navigate}) => {
   // localStorage.removeItem('loginUser')
   const signUp = async () => {
     try{
-      const response = await fetch('https://chat-hub-40gr.onrender.com/signup', {
+      const response = await fetch(`${HOST}/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import male from './imgs/male.jpg';
 import female from './imgs/female.jpg';
 
-const Chat = ({ navigate }) => {
+const Chat = ({ HOST, navigate }) => {
     const loginUser = localStorage.getItem('loginUser');
     const userToChat = localStorage.getItem('storedUserToChat');
     const [currentChat, setCurrentChat] = useState(() => JSON.parse(localStorage.getItem('currentChat')) || null);
@@ -17,7 +17,7 @@ const Chat = ({ navigate }) => {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const response = await fetch('https://chat-hub-40gr.onrender.com/chat', {
+                const response = await fetch(`${HOST}/chat`, {
                     method: 'GET',
                     headers: { 'Content-Type': 'application/json' },
                 });
@@ -52,7 +52,7 @@ const Chat = ({ navigate }) => {
         const showChats = async () => {
             if (!currentChat && userToChatDetail.username) {
                 try {
-                    const response = await fetch('https://chat-hub-40gr.onrender.com/chat/start', {
+                    const response = await fetch(`${HOST}/chat/start`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ loginUser, userToChat }),
@@ -77,7 +77,7 @@ const Chat = ({ navigate }) => {
         const fetchMessages = async () => {
             if (currentChat && currentChat._id) {
                 try {
-                    const response = await fetch(`https://chat-hub-40gr.onrender.com/api/chat/${currentChat._id}`);
+                    const response = await fetch(`${HOST}/api/chat/${currentChat._id}`);
                     if (response.ok) {
                         const data = await response.json();
                         setMessages(data);
@@ -109,7 +109,7 @@ const Chat = ({ navigate }) => {
 
     const sendMessage = async () => {
         try {
-            const response = await fetch('https://chat-hub-40gr.onrender.com/chat/send', {
+            const response = await fetch(`${HOST}/chat/send`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ chatId: currentChat._id, sender: loginUser, message: newMessage }),

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
-const Login = ({signupMessage, navigate, setLoginUser}) => {
+const Login = ({ HOST, signupMessage, navigate, setLoginUser }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -10,7 +10,7 @@ const Login = ({signupMessage, navigate, setLoginUser}) => {
 //   localStorage.removeItem('loginUser')
   const login = async () => {
     try {
-        const response = await fetch('https://chat-hub-40gr.onrender.com/login', {
+        const response = await fetch(`${HOST}/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

@@ -4,14 +4,15 @@ const cors = require('cors'); // Import cors
 const app = express();
 require('dotenv').config();
 const PORT = process.env.PORT || 8080;
-const mongoURL = process.env.DB_URL;
-
+// const mongoURL = process.env.DB_URL;
+const mongoURL = 'mongodb://localhost:27017/mydb';
 
 // CORS Configuration
 const corsOptions = {
-    origin: 'https://chat-hub-1.onrender.com',  // Allow only requests from this origin
-    credentials: true,               // Allow credentials (cookies) to be sent
+    origin: 'http://localhost:8081', // Use HTTP for localhost
+    credentials: true,               // Allow credentials (cookies)
 };
+
 
 // Apply CORS middleware
 app.use(cors(corsOptions));

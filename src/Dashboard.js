@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import male from './imgs/male.jpg';
 import female from './imgs/female.jpg';
 
-const Dashboard = ({ navigate, setSignupMessage, loginUser, logout }) => {
+const Dashboard = ({ HOST, navigate, setSignupMessage, loginUser, logout }) => {
     const [fullname, setFullname] = useState('');
     const [isLoading, setIsLoading] = useState(true);
     const [allUsers, setAllUsers] = useState([]);
@@ -17,7 +17,7 @@ const Dashboard = ({ navigate, setSignupMessage, loginUser, logout }) => {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const response = await fetch('https://chat-hub-40gr.onrender.com/dashboard', {
+                const response = await fetch(`${HOST}/dashboard`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -54,7 +54,7 @@ const Dashboard = ({ navigate, setSignupMessage, loginUser, logout }) => {
         localStorage.removeItem('storedUserToChat');
         setIsUsersLoading(true);
         try {
-            const response = await fetch('https://chat-hub-40gr.onrender.com/dashboard', {
+            const response = await fetch(`${HOST}/dashboard`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',

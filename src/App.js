@@ -10,6 +10,8 @@ function App() {
   const navigate = useNavigate();
   const [signupMessage, setSignupMessage] = useState('')
   const [loginUser, setLoginUser] = useState(localStorage.getItem('loginUser') || '');
+  // const HOST = 'portal.vikasweb.xyz';
+  const HOST = 'http://localhost:8081';
   console.log(loginUser);
 
 
@@ -36,11 +38,11 @@ function App() {
   return (
     <div className="App">
       <Routes>
-        <Route path="/" element={<SignUp navigate={navigate} signupMessage={signupMessage} setLoginUser={setLoginUser} />} />
-        <Route path="/signup" element={<SignUp navigate={navigate} signupMessage={signupMessage} setLoginUser={setLoginUser} />} />
-        <Route path="/login" element={<Login navigate={navigate} signupMessage={signupMessage} setLoginUser={setLoginUser} />} />
-        <Route path="/dashboard" element={<Dashboard navigate={navigate} setSignupMessage={setSignupMessage} loginUser={loginUser} logout={logout} />} />
-        <Route path="/chat" element={<Chat navigate={navigate} />} />
+        <Route path="/" element={<SignUp HOST={HOST} navigate={navigate} signupMessage={signupMessage} setLoginUser={setLoginUser} />} />
+        <Route path="/signup" element={<SignUp HOST={HOST} navigate={navigate} signupMessage={signupMessage} setLoginUser={setLoginUser} />} />
+        <Route path="/login" element={<Login HOST={HOST} navigate={navigate} signupMessage={signupMessage} setLoginUser={setLoginUser} />} />
+        <Route path="/dashboard" element={<Dashboard HOST={HOST} navigate={navigate} setSignupMessage={setSignupMessage} loginUser={loginUser} logout={logout} />} />
+        <Route path="/chat" element={<Chat HOST={HOST} navigate={navigate} />} />
         <Route path='*' element={<Missing />} />
       </Routes>
     </div>
