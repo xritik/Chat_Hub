@@ -493,10 +493,8 @@ nav {
   .welcomeuser{
     font-size: 15px;
     width: 60%;
-    border: 1px solid red;
   }
   .appname{
-    border: 1px solid red;
     font-size: 16px;
     justify-content: left;
     width: 25%;
@@ -504,7 +502,6 @@ nav {
   .part2{
     width: 15%;
     padding: 10px;
-    border: 1px solid red;
   }
   .logoutbutton{
     padding: 5px;
@@ -512,7 +509,6 @@ nav {
     font-size: 15px;
   }
   .all-users{
-    border: 2px solid red;
     /* padding: 20px 10px; */
     overflow-x: auto;
     /* overflow-x: hidden; */
@@ -522,7 +518,6 @@ nav {
   }
   
   .user-item{
-    border: 1px solid green;
     /* width: 95% !important; */
     gap: 0px;
     padding: 15px 25px;
@@ -531,7 +526,6 @@ nav {
     padding: 6px 12px;
     border-radius: 5px;
     font-size: 15px;
-    border: 1px solid red;
   }
   .para{
     padding-top: 15px;
