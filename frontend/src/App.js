@@ -10,8 +10,8 @@ function App() {
   const navigate = useNavigate();
   const [signupMessage, setSignupMessage] = useState('')
   const [loginUser, setLoginUser] = useState(localStorage.getItem('loginUser') || '');
-  // const HOST = 'portal.vikasweb.xyz';
-  const HOST = 'http://portal.vikasweb.xyz:8080';
+  // const HOST = 'http://portal.vikasweb.xyz:8080';
+  const HOST = 'http://localhost:8080';
   console.log(loginUser);
 
 
