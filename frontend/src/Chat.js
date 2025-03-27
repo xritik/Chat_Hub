@@ -13,11 +13,12 @@ const Chat = ({ HOST, navigate }) => {
     const [userToChatDetail, setUserToChatDetail] = useState({});
     const [allUsers, setAllUsers] = useState([]);
     const [errorMessage, setErrorMessage] = useState('');
+    const [isFirstScroll, setIsFirstScroll] = useState(true);
 
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const response = await fetch(`${HOST}/chat`, {
+                const response = await fetch(`${HOST}/users`, {
                     method: 'GET',
                     headers: { 'Content-Type': 'application/json' },
                 });
@@ -73,11 +74,12 @@ const Chat = ({ HOST, navigate }) => {
         showChats();
     }, [userToChatDetail?.username, loginUser, userToChat]);
 
+    
     useEffect(() => {
         const fetchMessages = async () => {
             if (currentChat && currentChat._id) {
                 try {
-                    const response = await fetch(`${HOST}/api/chat/${currentChat._id}`);
+                    const response = await fetch(`${HOST}/chat/${currentChat._id}`);
                     if (response.ok) {
                         const data = await response.json();
                         setMessages(data);
@@ -89,19 +91,28 @@ const Chat = ({ HOST, navigate }) => {
         };
 
         fetchMessages();
+        const interval = setInterval(fetchMessages, 1000);
+        return () => clearInterval(interval);
     }, [currentChat]);
 
 
-
-
-
-    const bottomRef = useRef(null);
+    const chatContainerRef = useRef(null);
+    const messagesEndRef = useRef(null);
 
     useEffect(() => {
-        // Scroll to the bottom when the component mounts
-        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+        const chatContainer = chatContainerRef.current;
+        if (!chatContainer) return;
+    
+        const isNearBottom =
+            chatContainer.scrollHeight - chatContainer.scrollTop <= chatContainer.clientHeight + 50;
+    
+        if (isFirstScroll || isNearBottom) {
+            setTimeout(() => {
+                messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+                setIsFirstScroll(false);
+            }, 300);
+        }
     }, [messages]);
-
 
 
 
@@ -144,7 +155,7 @@ const Chat = ({ HOST, navigate }) => {
                                 </span>
                                 <span className="chatUsername">{userToChatDetail?.fullname || 'Loading...'} <i className='bx bxs-badge-check'></i></span>
                             </div>
-                            <div className="messages">
+                            <div ref={chatContainerRef} className="messages" id='messages'>
                                 <div className="userProfile">
                                     <span className="profilePic">
                                         <img src={userToChatDetail.gender === 'Female' ? female : male} alt="profile" />
@@ -162,7 +173,7 @@ const Chat = ({ HOST, navigate }) => {
                                         </p>
                                     </div>
                                 ))}
-                                <div ref={bottomRef}></div>
+                                <div ref={messagesEndRef}></div>
                             </div>
                             
                             <form className='messageForm' onSubmit={(e) => {e.preventDefault(); sendMessage()}}>
