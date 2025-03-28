@@ -20,7 +20,7 @@ const loginRoutes = require('./routes/loginRoutes');
 app.use('/login', loginRoutes);
 
 const signupRoutes = require('./routes/signupRoutes');
-app.use('signup', signupRoutes);
+app.use('/signup', signupRoutes);
 
 const dashboardRoutes = require('./routes/dashboardRoutes');
 app.use('/dashboard', dashboardRoutes);
