@@ -4,10 +4,10 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 require('./db');
 
-// CORS Configuration
 const corsOptions = {
-    origin: ['http://localhost:3000', 'http://192.168.1.15:3000', 'http://portal.vikasweb.xyz:3000'], // Use HTTP for localhost
-    credentials: true,               // Allow credentials (cookies)
+    origin: '*',
+    // origin: 'http://192.168.1.6:3000',
+    // credentials: true
 };
 
 // Apply CORS middleware
