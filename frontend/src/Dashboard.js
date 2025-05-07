@@ -23,7 +23,7 @@ const Dashboard = ({ HOST, navigate, setSignupMessage, loginUser, logout }) => {
                         'Content-Type': 'application/json',
                         'login-user': loginUser, // Include user ID in headers
                     },
-                    credentials: 'include', // Include session cookies if used
+                    // credentials: 'include', // Include session cookies if used
                 });
     
                 if (response.ok) {
@@ -45,7 +45,7 @@ const Dashboard = ({ HOST, navigate, setSignupMessage, loginUser, logout }) => {
         };
     
         fetchUserData();
-    }, [navigate, setSignupMessage, loginUser, savedLoginUser], setTimeout(2000)); // Include all dependencies in the dependency array.
+    }, [navigate, setSignupMessage, loginUser, savedLoginUser, HOST]); // Include all dependencies in the dependency array.
 
 
     const fetchUsers = async () => {

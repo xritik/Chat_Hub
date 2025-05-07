@@ -103,9 +103,8 @@ const Chat = ({ HOST, navigate }) => {
         const chatContainer = chatContainerRef.current;
         if (!chatContainer) return;
     
-        const isNearBottom =
-            chatContainer.scrollHeight - chatContainer.scrollTop <= chatContainer.clientHeight + 50;
-    
+            const isNearBottom = chatContainer.scrollHeight - chatContainer.scrollTop <= chatContainer.clientHeight + 50;
+
         if (isFirstScroll || isNearBottom) {
             setTimeout(() => {
                 messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });

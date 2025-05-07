@@ -8,7 +8,7 @@ import Chat from './Chat';
 
 function App() {
   const navigate = useNavigate();
-  const [signupMessage, setSignupMessage] = useState('')
+  const [signupMessage, setSignupMessage] = useState('');
   const [loginUser, setLoginUser] = useState(localStorage.getItem('loginUser') || '');
   const HOST = `${window.location.protocol}//${window.location.hostname}:8080`;
   console.log(loginUser);
