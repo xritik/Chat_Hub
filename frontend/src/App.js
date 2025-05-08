@@ -1,10 +1,10 @@
 import {useState, useEffect} from 'react';
 import { Route, Routes, useNavigate } from 'react-router-dom';
-import Login from './Login';
-import SignUp from './SignUp'
-import Dashboard from './Dashboard'
-import Missing from './Missing';
-import Chat from './Chat';
+import Login from './components/Login';
+import SignUp from './components/SignUp'
+import Dashboard from './components/Dashboard'
+import Missing from './components/Missing';
+import Chat from './components/Chat';
 
 function App() {
   const navigate = useNavigate();

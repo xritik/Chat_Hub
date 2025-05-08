@@ -1,7 +1,7 @@
 import React, {useState, useEffect, useRef} from 'react';
 import { Link } from 'react-router-dom';
-import male from './imgs/male.jpg';
-import female from './imgs/female.jpg';
+import male from '../imgs/male.jpg';
+import female from '../imgs/female.jpg';
 
 const Chat = ({ HOST, navigate }) => {
     const loginUser = localStorage.getItem('loginUser');

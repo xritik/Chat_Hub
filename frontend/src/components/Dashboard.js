@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import male from './imgs/male.jpg';
-import female from './imgs/female.jpg';
+import male from '../imgs/male.jpg';
+import female from '../imgs/female.jpg';
 
 const Dashboard = ({ HOST, navigate, setSignupMessage, loginUser, logout }) => {
     const [fullname, setFullname] = useState('');
