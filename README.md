@@ -18,28 +18,28 @@ A full-stack real-time chat application built with the **MERN stack** (MongoDB, 
 
 ## 📂 Folder Structure
 
-Chat_Hub/
-│
-├── frontend/       # React frontend
-│ ├── public/
-│ └── src/
-│   ├── components/
-│   ├── imgs/
-│   ├── App.js
-│   └── index.js
-│   └── index.css
-│ └── package.json  # Frontend metadata and scripts
-│
-├── backend/        # Express backend
-│ ├── models/       # Mongoose schemas
-│ ├── routes/       # API endpoints
-│ ├── db.js         # Database connection
-│ ├── package.json  # Backend metadata and scripts
-│ └── server.js     # Entry point
-│
-├── .gitignore
-├── package.json    # Project metadata and scripts
-└── README.md       # You're reading it!
+Chat_Hub/                                              <br>
+│                                                      <br>
+├── frontend/       # React frontend                   <br>
+│ ├── public/                                          <br>
+│ └── src/                                             <br>
+│   ├── components/                                    <br>
+│   ├── imgs/                                          <br>
+│   ├── App.js                                         <br>
+│   └── index.js                                       <br>
+│   └── index.css                                      <br>
+│ └── package.json  # Frontend metadata and scripts    <br>
+│                                                      <br>
+├── backend/        # Express backend                  <br>
+│ ├── models/       # Mongoose schemas                 <br>
+│ ├── routes/       # API endpoints                    <br>
+│ ├── db.js         # Database connection              <br>
+│ ├── package.json  # Backend metadata and scripts     <br>
+│ └── server.js     # Entry point                      <br>
+│                                                      <br>
+├── .gitignore                                         <br>
+├── package.json    # Project metadata and scripts     <br>
+└── README.md       # You're reading it!               <br>
 
 
 
