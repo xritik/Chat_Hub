@@ -1,70 +1,97 @@
-# Getting Started with Create React App
+# 💬 MERN Real-Time Chat App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A full-stack real-time chat application built with the **MERN stack** (MongoDB, Express.js, React.js, Node.js) and **Socket.IO**. Users can register, log in, view all other users, and initiate one-on-one private chats.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## 🚀 Features
 
-### `npm start`
+- ✅ User Registration & Login (with validation)
+- ✅ JWT-based Authentication
+- ✅ Private One-on-One Messaging
+- ✅ Real-Time Communication with Socket.IO
+- ✅ User List with "Chat" Buttons
+- ✅ MongoDB for Data Persistence
+- ✅ Simple, Responsive UI
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+---
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## 📂 Folder Structure
 
-### `npm test`
+Chat_Hub/
+│
+├── frontend/       # React frontend
+│ ├── public/
+│ └── src/
+│   ├── components/
+│   ├── imgs/
+│   ├── App.js
+│   └── index.js
+│   └── index.css
+│ └── package.json  # Frontend metadata and scripts
+│
+├── backend/        # Express backend
+│ ├── models/       # Mongoose schemas
+│ ├── routes/       # API endpoints
+│ ├── db.js         # Database connection
+│ ├── package.json  # Backend metadata and scripts
+│ └── server.js     # Entry point
+│
+├── .gitignore
+├── package.json    # Project metadata and scripts
+└── README.md       # You're reading it!
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-### `npm run build`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+---
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## 🧪 Tech Stack
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+**Frontend:**
 
-### `npm run eject`
+- React.js
+- HTML/CSS
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+**Backend:**
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- Node.js
+- Express.js
+- MongoDB with Mongoose
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+---
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## 🔧 Getting Started
 
-## Learn More
+### 1. Clone the Repository
+### 1. Clone the Repository
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+git clone https://github.com/xritik/Chat_Hub.git
+cd Chat_Hub
 
-To learn React, check out the [React documentation](https://reactjs.org/).
 
-### Code Splitting
+### Install Dependencies
+## Backend
+cd backend
+npm install
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## Frontend
+cd ../frontend
+npm install
 
-### Analyzing the Bundle Size
+## At project root
+cd ../
+npm install
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## Run the Application
+npm start
 
-### Making a Progressive Web App
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+### 🌐 Usage:
 
-### Advanced Configuration
+# Register or login with an existing account.
+# Click "Chat with Others".
+# Select a user and start chatting in real-time!
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+### 👨‍💻 Author
+Developed with ❤️ by [Ritik](https://github.com/xritik).
+```bash
