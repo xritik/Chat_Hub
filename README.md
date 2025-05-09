@@ -13,6 +13,13 @@ A full-stack real-time chat application built with the **MERN stack** (MongoDB, 
 - ✅ MongoDB for Data Persistence
 - ✅ Simple, Responsive UI
 <br>
+<br>
+
+## 📸 Screenshots
+
+<img src="frontend/src/imgs/Chat_Hub_Login_Page.png">
+<img src="frontend/src/imgs/Chat_Hub_Dashboard.png">
+<img src="frontend/src/imgs/Chat_Hub_Chatting.png">
 
 ## 📂 Folder Structure
 
