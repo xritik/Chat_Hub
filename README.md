@@ -1,6 +1,6 @@
 # 💬 MERN Real-Time Chat App
 
-A full-stack real-time chat application built with the **MERN stack** (MongoDB, Express.js, React.js, Node.js) and **Socket.IO**. Users can register, log in, view all other users, and initiate one-on-one private chats.
+A full-stack real-time chat application built with the **MERN stack** (MongoDB, Express.js, React.js, Node.js). Users can register, log in, view all other registered users, and initiate one-on-one private chats.
 <br>
 <br>
 
@@ -16,9 +16,17 @@ A full-stack real-time chat application built with the **MERN stack** (MongoDB, 
 <br>
 
 ## 📸 Screenshots
+<br>
 
+- **Login Page**
 <img src="frontend/src/imgs/Chat_Hub_Login_Page.png">
+<br>
+
+- **Dashboard Page**
 <img src="frontend/src/imgs/Chat_Hub_Dashboard.png">
+<br>
+
+- **Chatting Page**
 <img src="frontend/src/imgs/Chat_Hub_Chatting.png">
 
 ## 📂 Folder Structure
