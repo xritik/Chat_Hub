@@ -76,6 +76,9 @@ Chat_Hub/                                              <br>
   </tbody>
 </table>
 
+<br>
+<br>
+
 ## 🔧 Getting Started
 
 **1. Clone the Repository**
