@@ -1,8 +1,8 @@
 # 💬 MERN Real-Time Chat App
 
 A full-stack real-time chat application built with the **MERN stack** (MongoDB, Express.js, React.js, Node.js) and **Socket.IO**. Users can register, log in, view all other users, and initiate one-on-one private chats.
-
----
+<br>
+<br>
 
 ## 🚀 Features
 
@@ -12,8 +12,7 @@ A full-stack real-time chat application built with the **MERN stack** (MongoDB, 
 - ✅ User List with "Chat" Buttons
 - ✅ MongoDB for Data Persistence
 - ✅ Simple, Responsive UI
-
----
+<br>
 
 ## 📂 Folder Structure
 
@@ -39,11 +38,8 @@ Chat_Hub/                                              <br>
 ├── .gitignore                                         <br>
 ├── package.json    # Project metadata and scripts     <br>
 └── README.md       # You're reading it!               <br>
-
-
-
----
-
+<br>
+<br>
 
 ## 🧪 Tech Stack
 
@@ -58,46 +54,59 @@ Chat_Hub/                                              <br>
 - Express.js
 - MongoDB with Mongoose
 
----
+<br>
+<br>
 
 ## 🔧 Getting Started
 
-### 1. Clone the Repository
+**1. Clone the Repository**
 
-git clone https://github.com/xritik/Chat_Hub.git <br>
+```bash
+git clone https://github.com/xritik/Chat_Hub.git
 cd Chat_Hub
+```
+<br>
+<br>
 
----
+**2. Install Dependencies**
 
-## Install Dependencies
-### Backend
-cd backend        <br>
+- **At Project Root:**
+
+```bash
 npm install
+```
 
-### Frontend
-cd ../frontend    <br>
+- **Frontend:**
+
+```bash
+cd ../frontend
 npm install
+```
 
-### At project root
-cd ../            <br>
+- **Backend:**
+
+```bash
+cd backend
 npm install
+```
+<br>
+<br>
 
----
-
-## Run the Application
+**3. Run the Application**
+```bash
+cd ../
 npm start
-
----
-
+```
+<br>
+<br>
 
 ## 🌐 Usage:
 
-***Register or login with an existing account.***
-***Click "Chat with Others".***
-***Select a user and start chatting in real-time!***
-
----
+- Register or login with an existing account.
+- Click "Chat with Others".
+- Select a user and start chatting in real-time!
+<br>
+<br>
 
 ## 👨‍💻 Author
 Developed with ❤️ by [Ritik](https://github.com/xritik).
-```bash
