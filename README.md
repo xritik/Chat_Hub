@@ -57,6 +57,25 @@ Chat_Hub/                                              <br>
 <br>
 <br>
 
+## 🧱 Required Tech Stack & their Versions
+
+<table width="500px">
+  <thead>
+    <th>Technology</th>
+    <th>Version</th>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Node.js</td>
+      <td>20.19.0</td>
+    </tr>
+    <tr>
+      <td>MongoDB</td>
+      <td>8.0.1</td>
+    </tr>
+  </tbody>
+</table>
+
 ## 🔧 Getting Started
 
 **1. Clone the Repository**
