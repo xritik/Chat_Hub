@@ -7,9 +7,8 @@ A full-stack real-time chat application built with the **MERN stack** (MongoDB, 
 ## 🚀 Features
 
 - ✅ User Registration & Login (with validation)
-- ✅ JWT-based Authentication
 - ✅ Private One-on-One Messaging
-- ✅ Real-Time Communication with Socket.IO
+- ✅ Real-Time Communication
 - ✅ User List with "Chat" Buttons
 - ✅ MongoDB for Data Persistence
 - ✅ Simple, Responsive UI
@@ -82,10 +81,12 @@ npm install
 ### At project root
 cd ../            <br>
 npm install
+
 ---
 
 ## Run the Application
 npm start
+
 ---
 
 
@@ -94,6 +95,7 @@ npm start
 ***Register or login with an existing account.***
 ***Click "Chat with Others".***
 ***Select a user and start chatting in real-time!***
+
 ---
 
 ## 👨‍💻 Author
