@@ -45,6 +45,7 @@ Chat_Hub/                                              <br>
 
 ---
 
+
 ## 🧪 Tech Stack
 
 **Frontend:**
@@ -63,35 +64,38 @@ Chat_Hub/                                              <br>
 ## 🔧 Getting Started
 
 ### 1. Clone the Repository
-### 1. Clone the Repository
 
-git clone https://github.com/xritik/Chat_Hub.git
+git clone https://github.com/xritik/Chat_Hub.git <br>
 cd Chat_Hub
 
+---
 
-### Install Dependencies
-## Backend
-cd backend
+## Install Dependencies
+### Backend
+cd backend        <br>
 npm install
 
-## Frontend
-cd ../frontend
+### Frontend
+cd ../frontend    <br>
 npm install
 
-## At project root
-cd ../
+### At project root
+cd ../            <br>
 npm install
+---
 
 ## Run the Application
 npm start
+---
 
 
-### 🌐 Usage:
+## 🌐 Usage:
 
-# Register or login with an existing account.
-# Click "Chat with Others".
-# Select a user and start chatting in real-time!
+***Register or login with an existing account.***
+***Click "Chat with Others".***
+***Select a user and start chatting in real-time!***
+---
 
-### 👨‍💻 Author
+## 👨‍💻 Author
 Developed with ❤️ by [Ritik](https://github.com/xritik).
 ```bash
