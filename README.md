@@ -1,4 +1,4 @@
-# 💬 MERN Real-Time Chat App
+# 💬 ChatHub - MERN Real-Time Chat App
 
 A full-stack real-time chat application built with the **MERN stack** (MongoDB, Express.js, React.js, Node.js). Users can register, log in, view all other registered users, and initiate one-on-one private chats.
 <br>
