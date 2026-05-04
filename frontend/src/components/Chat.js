@@ -6,7 +6,9 @@ import female from '../imgs/female.jpg';
 const Chat = ({ HOST, navigate }) => {
     const loginUser = localStorage.getItem('loginUser');
     const userToChat = localStorage.getItem('storedUserToChat');
-    const [currentChat, setCurrentChat] = useState(() => JSON.parse(localStorage.getItem('currentChat')) || null);
+
+    // const [currentChat, setCurrentChat] = useState(() => JSON.parse(localStorage.getItem('currentChat')) || null);
+    const [currentChat, setCurrentChat] = useState(null);
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
     const [isLoading, setIsLoading] = useState(true);
@@ -15,14 +17,23 @@ const Chat = ({ HOST, navigate }) => {
     const [errorMessage, setErrorMessage] = useState('');
     const [isFirstScroll, setIsFirstScroll] = useState(true);
 
+    const socketRef = useRef(null);
+    const chatContainerRef = useRef(null);
+    const messagesEndRef = useRef(null);
+
+
+    useEffect(() => {
+        const storedChat = localStorage.getItem('currentChat');
+        if (storedChat) {
+            setCurrentChat(JSON.parse(storedChat));
+        }
+    }, []);
+
+    // 1. Fetch all users
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const response = await fetch(`${HOST}/users`, {
-                    method: 'GET',
-                    headers: { 'Content-Type': 'application/json' },
-                });
-
+                const response = await fetch(`${HOST}/users`);
                 if (response.ok) {
                     const data = await response.json();
                     setAllUsers(data.users);
@@ -31,13 +42,14 @@ const Chat = ({ HOST, navigate }) => {
                     setErrorMessage('Something went wrong!!');
                 }
             } catch (err) {
-                console.error('Error fetching user data:', err);
-                setErrorMessage('An error occurred, Please try again');
+                console.error(err);
+                setErrorMessage('An error occurred');
             }
         };
         fetchUserData();
     }, []);
 
+    // 2. Find selected user
     useEffect(() => {
         const matchedUser = allUsers.find((user) => user.username === userToChat);
         if (matchedUser) {
@@ -49,6 +61,7 @@ const Chat = ({ HOST, navigate }) => {
         setIsLoading(false);
     }, [allUsers, userToChat]);
 
+    // 3. Start chat
     useEffect(() => {
         const showChats = async () => {
             if (!currentChat && userToChatDetail.username) {
@@ -58,7 +71,6 @@ const Chat = ({ HOST, navigate }) => {
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ loginUser, userToChat }),
                     });
-                    console.log('first')
 
                     if (response.ok) {
                         const chat = await response.json();
@@ -66,44 +78,90 @@ const Chat = ({ HOST, navigate }) => {
                         localStorage.setItem('currentChat', JSON.stringify(chat));
                     }
                 } catch (error) {
-                    console.error('Error opening chat:', error);
+                    console.error(error);
                 }
             }
         };
-
         showChats();
     }, [userToChatDetail?.username, loginUser, userToChat]);
 
-    
+
+    // ADD IT RIGHT HERE
     useEffect(() => {
+        setMessages([]);
+    }, [currentChat]);
+
+
+    // 4. Fetch old messages (ONLY ONCE)
+    useEffect(() => {
+        if (!currentChat?._id) return;
+
         const fetchMessages = async () => {
-            if (currentChat && currentChat._id) {
-                try {
-                    const response = await fetch(`${HOST}/chat/${currentChat._id}`);
-                    if (response.ok) {
-                        const data = await response.json();
-                        setMessages(data);
-                    }
-                } catch (error) {
-                    console.error('Error fetching messages:', error);
+            try {
+                console.log("Fetching old messages...");
+
+                const response = await fetch(`${HOST}/chat/${currentChat._id}`);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log("Old messages:", data);
+
+                    // IMPORTANT: attach chatId to each message
+                    const formattedMessages = data.map(msg => ({
+                        ...msg,
+                        chatId: currentChat._id
+                    }));
+
+                    setMessages(formattedMessages);
                 }
+            } catch (error) {
+                console.error(error);
             }
         };
 
         fetchMessages();
-        const interval = setInterval(fetchMessages, 1000);
-        return () => clearInterval(interval);
     }, [currentChat]);
 
+    // 5. WebSocket Connection
+    useEffect(() => {
+        if (socketRef.current) return; // prevent multiple connections
 
-    const chatContainerRef = useRef(null);
-    const messagesEndRef = useRef(null);
+        socketRef.current = new WebSocket("ws://localhost:8080");
 
+        socketRef.current.onopen = () => {
+            console.log("WebSocket Connected");
+        };
+
+        socketRef.current.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+
+            console.log("Received:", data);
+
+            setMessages(prev => [...prev, data]); // DON'T filter here
+        };
+
+        socketRef.current.onclose = () => {
+            console.log("WebSocket Disconnected");
+        };
+
+        return () => {
+            socketRef.current?.close();
+            socketRef.current = null;
+        };
+    }, []);
+
+
+
+
+
+
+    // 6. Auto Scroll
     useEffect(() => {
         const chatContainer = chatContainerRef.current;
         if (!chatContainer) return;
-    
-            const isNearBottom = chatContainer.scrollHeight - chatContainer.scrollTop <= chatContainer.clientHeight + 50;
+
+        const isNearBottom =
+            chatContainer.scrollHeight - chatContainer.scrollTop <= chatContainer.clientHeight + 50;
 
         if (isFirstScroll || isNearBottom) {
             setTimeout(() => {
@@ -113,26 +171,20 @@ const Chat = ({ HOST, navigate }) => {
         }
     }, [messages]);
 
+    // 7. Send Message via WebSocket
+    const sendMessage = () => {
+        if (!newMessage.trim()) return;
+        if (!socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) return;
 
+        const messageData = {
+            chatId: currentChat._id,
+            sender: loginUser,
+            message: newMessage
+        };
 
+        socketRef.current.send(JSON.stringify(messageData));
 
-
-    const sendMessage = async () => {
-        try {
-            const response = await fetch(`${HOST}/chat/send`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ chatId: currentChat._id, sender: loginUser, message: newMessage }),
-            });
-
-            if (response.ok) {
-                const sentMessage = { sender: loginUser, message: newMessage, timestamp: new Date() };
-                setMessages((prev) => [...prev, sentMessage]);
-                setNewMessage('');
-            }
-        } catch (error) {
-            console.error('Error sending message:', error);
-        }
+        setNewMessage('');
     };
 
 
@@ -164,13 +216,15 @@ const Chat = ({ HOST, navigate }) => {
                                 </div>
                                 {errorMessage && <p className="errorMessage">{errorMessage}</p>}
                             
-                                {messages.map((msg, index) => (
-                                    <div key={index} className={`message ${msg.sender === loginUser ? 'sent' : 'received'}`}>
-                                        <p className="messageContent" style={{backgroundColor: `${msg.sender === loginUser ? 'purple' : 'green'}`}}>
-                                        <span>{msg.message}</span>
-                                        <small>{new Date(msg.timestamp).toLocaleTimeString().slice(0, 5)}</small>
-                                        </p>
-                                    </div>
+                                {messages
+                                    .filter(msg => msg.chatId === currentChat?._id)
+                                    .map((msg, index) => (
+                                        <div key={index} className={`message ${msg.sender === loginUser ? 'sent' : 'received'}`}>
+                                            <p className="messageContent" style={{backgroundColor: `${msg.sender === loginUser ? 'purple' : 'green'}`}}>
+                                            <span>{msg.message}</span>
+                                            <small>{new Date(msg.timestamp).toLocaleTimeString().slice(0, 5)}</small>
+                                            </p>
+                                        </div>
                                 ))}
                                 <div ref={messagesEndRef}></div>
                             </div>
