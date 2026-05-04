@@ -48,7 +48,7 @@ const Chat = ({ HOST, navigate }) => {
             }
         };
         fetchUserData();
-    }, []);
+    }, [HOST]);
 
     // 2. Find selected user
     useEffect(() => {
@@ -84,7 +84,7 @@ const Chat = ({ HOST, navigate }) => {
             }
         };
         showChats();
-    }, [userToChatDetail?.username, loginUser, userToChat]);
+    }, [userToChatDetail?.username, loginUser, userToChat, HOST]);
 
 
     // ADD IT RIGHT HERE
@@ -121,7 +121,7 @@ const Chat = ({ HOST, navigate }) => {
         };
 
         fetchMessages();
-    }, [currentChat]);
+    }, [currentChat, HOST]);
 
     // 5. WebSocket Connection
     useEffect(() => {
@@ -170,7 +170,7 @@ const Chat = ({ HOST, navigate }) => {
                 setIsFirstScroll(false);
             }, 300);
         }
-    }, [messages]);
+    }, [messages, isFirstScroll]);
 
     // 7. Send Message via WebSocket
     const sendMessage = () => {
