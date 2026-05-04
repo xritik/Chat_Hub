@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express');
 const cors = require('cors');
 const http = require("http");
@@ -41,23 +43,23 @@ const wss = new WebSocket.Server({ server });
 // Store connected clients
 let clients = [];
 
+let clients = {}; // userId -> ws
+
 wss.on("connection", (ws) => {
     console.log("✅ New WebSocket connection");
 
-    // Store client
-    clients.push(ws);
-
-    // Receive message from frontend
     ws.on("message", async (message) => {
         try {
             const data = JSON.parse(message);
 
-            // Expected data:
-            // { chatId, sender, message }
+            // Register user
+            if (data.type === "register") {
+                clients[data.userId] = ws;
+                return;
+            }
 
-            const { chatId, sender, message: text } = data;
+            const { chatId, sender, receiverId, message: text } = data;
 
-            // 🔥 Save to MongoDB
             const chat = await Chat.findById(chatId);
             if (!chat) return;
 
@@ -70,17 +72,17 @@ wss.on("connection", (ws) => {
             chat.messages.push(newMessage);
             await chat.save();
 
-            // 🔥 Broadcast ONLY to relevant users (basic version = all)
-            clients.forEach(client => {
-                if (client.readyState === WebSocket.OPEN) {
-                    client.send(JSON.stringify({
-                        chatId: chatId,              // ✅ VERY IMPORTANT
-                        sender: newMessage.sender,
-                        message: newMessage.message,
-                        timestamp: newMessage.timestamp
-                    }));
-                }
-            });
+            // Send only to receiver
+            const receiverWs = clients[receiverId];
+
+            if (receiverWs && receiverWs.readyState === WebSocket.OPEN) {
+                receiverWs.send(JSON.stringify({
+                    chatId,
+                    sender,
+                    message: text,
+                    timestamp: newMessage.timestamp
+                }));
+            }
 
         } catch (err) {
             console.error("❌ Error:", err);
@@ -88,7 +90,11 @@ wss.on("connection", (ws) => {
     });
 
     ws.on("close", () => {
-        clients = clients.filter(client => client !== ws);
+        for (let userId in clients) {
+            if (clients[userId] === ws) {
+                delete clients[userId];
+            }
+        }
         console.log("❌ Client disconnected");
     });
 });

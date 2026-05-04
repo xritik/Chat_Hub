@@ -1,21 +1,29 @@
 const mongoose = require('mongoose');
 
-const mongoURL = 'mongodb://localhost:27017/mydb'
+const mongoURL = process.env.MONGO_URI; // 🔥 from env
 
-mongoose.connect(mongoURL);
+if (!mongoURL) {
+    console.error("❌ MONGO_URI not defined");
+    process.exit(1);
+}
+
+mongoose.connect(mongoURL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+});
 
 const db = mongoose.connection;
 
 db.on('connected', () => {
-    console.log('Connected to mongoDB server...');
-})
+    console.log('✅ Connected to MongoDB Atlas');
+});
 
 db.on('error', (err) => {
-    console.error('MongoDB connection Error:- ', err);
+    console.error('❌ MongoDB connection Error:', err);
 });
 
 db.on('disconnected', () => {
-    console.log('Disconnected to mongoDB server..')
+    console.log('⚠️ MongoDB disconnected');
 });
 
 module.exports = db;
