@@ -84,7 +84,7 @@ const Chat = ({ HOST, navigate }) => {
             }
         };
         showChats();
-    }, [userToChatDetail?.username, loginUser, userToChat, HOST]);
+    }, [userToChatDetail?.username, loginUser, userToChat, HOST, currentChat]);
 
 
     // ADD IT RIGHT HERE
