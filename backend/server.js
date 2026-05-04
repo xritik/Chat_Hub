@@ -43,8 +43,6 @@ const wss = new WebSocket.Server({ server });
 // Store connected clients
 let clients = [];
 
-let clients = {}; // userId -> ws
-
 wss.on("connection", (ws) => {
     console.log("✅ New WebSocket connection");
 
