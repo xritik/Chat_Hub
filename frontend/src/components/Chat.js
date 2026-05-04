@@ -2,6 +2,7 @@ import React, {useState, useEffect, useRef} from 'react';
 import { Link } from 'react-router-dom';
 import male from '../imgs/male.jpg';
 import female from '../imgs/female.jpg';
+const socket = new WebSocket(process.env.REACT_APP_WS_URL);
 
 const Chat = ({ HOST, navigate }) => {
     const loginUser = localStorage.getItem('loginUser');
@@ -126,7 +127,7 @@ const Chat = ({ HOST, navigate }) => {
     useEffect(() => {
         if (socketRef.current) return; // prevent multiple connections
 
-        socketRef.current = new WebSocket("ws://localhost:8080");
+        socketRef.current = socket
 
         socketRef.current.onopen = () => {
             console.log("WebSocket Connected");
