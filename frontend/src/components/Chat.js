@@ -96,7 +96,8 @@ const Chat = ({ HOST, navigate }) => {
 
             const formatted = data.map(msg => ({
                 ...msg,
-                chatId: currentChat._id
+                chatId: currentChat._id,
+                timestamp: msg.timestamp || new Date() // ✅ fallback fix
             }));
 
             setMessages(formatted);
@@ -192,7 +193,8 @@ const Chat = ({ HOST, navigate }) => {
             chatId: currentChat._id,
             sender: loginUser,
             receiverId: userToChat,
-            message: newMessage
+            message: newMessage,
+            timestamp: new Date().toISOString() 
         };
 
         socket.send(JSON.stringify(messageData));
@@ -201,6 +203,19 @@ const Chat = ({ HOST, navigate }) => {
         setMessages(prev => [...prev, messageData]);
 
         setNewMessage('');
+    };
+
+    const formatTime = (timestamp) => {
+        if (!timestamp) return "";
+
+        const date = new Date(timestamp);
+
+        if (isNaN(date.getTime())) return ""; // ❌ prevents "Invalid Date"
+
+        return date.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit"
+        });
     };
 
   return (
@@ -237,7 +252,7 @@ const Chat = ({ HOST, navigate }) => {
                                         <div key={index} className={`message ${msg.sender === loginUser ? 'sent' : 'received'}`}>
                                             <p className="messageContent" style={{backgroundColor: `${msg.sender === loginUser ? 'purple' : 'green'}`}}>
                                             <span>{msg.message}</span>
-                                            <small>{new Date(msg.timestamp).toLocaleTimeString().slice(0, 5)}</small>
+                                            <small>{formatTime(msg.timestamp)}</small>
                                             </p>
                                         </div>
                                 ))}
