@@ -84,7 +84,7 @@ wss.on("connection", (ws) => {
             const newMessage = {
                 sender,
                 message: text,
-                timestamp: new Date(),
+                timestamp: new Date().toISOString(),
             };
 
             chat.messages.push(newMessage);
