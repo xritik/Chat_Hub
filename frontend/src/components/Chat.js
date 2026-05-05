@@ -2,7 +2,6 @@ import React, {useState, useEffect, useRef} from 'react';
 import { Link } from 'react-router-dom';
 import male from '../imgs/male.jpg';
 import female from '../imgs/female.jpg';
-const socket = new WebSocket(process.env.REACT_APP_WS_URL);
 
 const Chat = ({ HOST, navigate }) => {
     const loginUser = localStorage.getItem('loginUser');
@@ -28,7 +27,7 @@ const Chat = ({ HOST, navigate }) => {
         if (storedChat && !currentChat) {
             setCurrentChat(JSON.parse(storedChat));
         }
-    }, []);
+    }, [currentChat]);
 
     // 1. Fetch all users
     useEffect(() => {
@@ -43,7 +42,10 @@ const Chat = ({ HOST, navigate }) => {
     // 2. Find selected user
     useEffect(() => {
         const matched = allUsers.find(u => u.username === userToChat);
-        if (matched) setUserToChatDetail(matched);
+        if (matched){
+            setUserToChatDetail(matched);
+            setIsLoading(false);
+        }
     }, [allUsers, userToChat]);
 
     // 3. Start chat
@@ -51,14 +53,26 @@ const Chat = ({ HOST, navigate }) => {
         if (!userToChatDetail.username) return;
 
         const startChat = async () => {
-            const res = await fetch(`${HOST}/chat/start`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ loginUser, userToChat })
-            });
+            try {
+                setErrorMessage(""); // clear old errors if any
 
-            const chat = await res.json();
-            setCurrentChat(chat);
+                const res = await fetch(`${HOST}/chat/start`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ loginUser, userToChat })
+                });
+
+                if (!res.ok) {
+                    const errorData = await res.json();
+                    throw new Error(errorData.message || "Failed to start chat");
+                }
+
+                const chat = await res.json();
+                setCurrentChat(chat);
+
+            } catch (error) {
+                setErrorMessage(error.message || "Something went wrong while starting chat");
+            }
         };
 
         startChat();
