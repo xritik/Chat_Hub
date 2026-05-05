@@ -155,7 +155,7 @@ const Chat = ({ HOST, navigate }) => {
         return () => {
             socket?.close();
         };
-    }, [loginUser]); // ❌ removed currentChat
+    }, [loginUser, currentChat?._id]); // ❌ removed currentChat
 
 
 
