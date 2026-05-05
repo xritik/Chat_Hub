@@ -118,7 +118,6 @@ const Chat = ({ HOST, navigate }) => {
             socket.onopen = () => {
                 console.log("✅ WS Connected");
 
-                // 🔥 REGISTER USER (VERY IMPORTANT)
                 socket.send(JSON.stringify({
                     type: "register",
                     userId: loginUser
@@ -130,15 +129,19 @@ const Chat = ({ HOST, navigate }) => {
 
                 console.log("📩 Received:", data);
 
-                // 🔥 Only update current chat
-                if (data.chatId === currentChat?._id) {
-                    setMessages(prev => [...prev, data]);
-                }
+                // ✅ IMPORTANT FIX: use functional update + check safely
+                setMessages(prev => {
+                    // only push if belongs to current chat
+                    if (data.chatId === currentChat?._id) {
+                        return [...prev, data];
+                    }
+                    return prev;
+                });
             };
 
             socket.onclose = () => {
                 console.log("❌ WS Disconnected → Reconnecting...");
-                setTimeout(connect, 2000); // 🔁 reconnect
+                setTimeout(connect, 2000);
             };
 
             socket.onerror = (err) => {
@@ -152,7 +155,7 @@ const Chat = ({ HOST, navigate }) => {
         return () => {
             socket?.close();
         };
-    }, [loginUser, currentChat]);
+    }, [loginUser]); // ❌ removed currentChat
 
 
 
@@ -177,18 +180,28 @@ const Chat = ({ HOST, navigate }) => {
     // 7. Send Message via WebSocket
     const sendMessage = () => {
         if (!newMessage.trim()) return;
-        if (!socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) return;
 
-        socketRef.current.send(JSON.stringify({
+        const socket = socketRef.current;
+
+        if (!socket || socket.readyState !== WebSocket.OPEN) {
+            console.log("❌ Socket not connected");
+            return;
+        }
+
+        const messageData = {
             chatId: currentChat._id,
             sender: loginUser,
-            receiverId: userToChat, // 🔥 IMPORTANT
+            receiverId: userToChat,
             message: newMessage
-        }));
+        };
+
+        socket.send(JSON.stringify(messageData));
+
+        // ✅ optional: optimistic UI update (instant message)
+        setMessages(prev => [...prev, messageData]);
 
         setNewMessage('');
     };
-
 
   return (
     <div>
