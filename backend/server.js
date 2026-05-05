@@ -41,7 +41,7 @@ const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
 // Store connected clients
-let clients = [];
+let clients = {}; // userId -> ws
 
 wss.on("connection", (ws) => {
     console.log("✅ New WebSocket connection");
@@ -50,14 +50,17 @@ wss.on("connection", (ws) => {
         try {
             const data = JSON.parse(message);
 
-            // Register user
+            // 🔥 1. Register user
             if (data.type === "register") {
                 clients[data.userId] = ws;
+                ws.userId = data.userId; // attach for cleanup
+                console.log(`🟢 User connected: ${data.userId}`);
                 return;
             }
 
             const { chatId, sender, receiverId, message: text } = data;
 
+            // 🔥 2. Save message
             const chat = await Chat.findById(chatId);
             if (!chat) return;
 
@@ -70,16 +73,23 @@ wss.on("connection", (ws) => {
             chat.messages.push(newMessage);
             await chat.save();
 
-            // Send only to receiver
-            const receiverWs = clients[receiverId];
+            const payload = JSON.stringify({
+                chatId,
+                sender,
+                message: text,
+                timestamp: newMessage.timestamp
+            });
 
+            // 🔥 3. Send to RECEIVER
+            const receiverWs = clients[receiverId];
             if (receiverWs && receiverWs.readyState === WebSocket.OPEN) {
-                receiverWs.send(JSON.stringify({
-                    chatId,
-                    sender,
-                    message: text,
-                    timestamp: newMessage.timestamp
-                }));
+                receiverWs.send(payload);
+            }
+
+            // 🔥 4. ALSO send to SENDER (CRITICAL FIX)
+            const senderWs = clients[sender];
+            if (senderWs && senderWs.readyState === WebSocket.OPEN) {
+                senderWs.send(payload);
             }
 
         } catch (err) {
@@ -87,13 +97,12 @@ wss.on("connection", (ws) => {
         }
     });
 
+    // 🔥 5. Clean up on disconnect
     ws.on("close", () => {
-        for (let userId in clients) {
-            if (clients[userId] === ws) {
-                delete clients[userId];
-            }
+        if (ws.userId) {
+            delete clients[ws.userId];
+            console.log(`❌ User disconnected: ${ws.userId}`);
         }
-        console.log("❌ Client disconnected");
     });
 });
 
