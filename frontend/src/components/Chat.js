@@ -25,71 +25,50 @@ const Chat = ({ HOST, navigate }) => {
 
     useEffect(() => {
         const storedChat = localStorage.getItem('currentChat');
-        if (storedChat) {
+        if (storedChat && !currentChat) {
             setCurrentChat(JSON.parse(storedChat));
         }
     }, []);
 
     // 1. Fetch all users
     useEffect(() => {
-        const fetchUserData = async () => {
-            try {
-                const response = await fetch(`${HOST}/users`);
-                if (response.ok) {
-                    const data = await response.json();
-                    setAllUsers(data.users);
-                    localStorage.setItem('storedAllUsers', JSON.stringify(data.users));
-                } else {
-                    setErrorMessage('Something went wrong!!');
-                }
-            } catch (err) {
-                console.error(err);
-                setErrorMessage('An error occurred');
-            }
+        const fetchUsers = async () => {
+            const res = await fetch(`${HOST}/users`);
+            const data = await res.json();
+            setAllUsers(data.users);
         };
-        fetchUserData();
+        fetchUsers();
     }, [HOST]);
 
     // 2. Find selected user
     useEffect(() => {
-        const matchedUser = allUsers.find((user) => user.username === userToChat);
-        if (matchedUser) {
-            setUserToChatDetail(matchedUser);
-            setErrorMessage('');
-        } else {
-            setErrorMessage('User not found!');
-        }
-        setIsLoading(false);
+        const matched = allUsers.find(u => u.username === userToChat);
+        if (matched) setUserToChatDetail(matched);
     }, [allUsers, userToChat]);
 
     // 3. Start chat
     useEffect(() => {
-        const showChats = async () => {
-            if (!currentChat && userToChatDetail.username) {
-                try {
-                    const response = await fetch(`${HOST}/chat/start`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ loginUser, userToChat }),
-                    });
+        if (!userToChatDetail.username) return;
 
-                    if (response.ok) {
-                        const chat = await response.json();
-                        setCurrentChat(chat);
-                        localStorage.setItem('currentChat', JSON.stringify(chat));
-                    }
-                } catch (error) {
-                    console.error(error);
-                }
-            }
+        const startChat = async () => {
+            const res = await fetch(`${HOST}/chat/start`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ loginUser, userToChat })
+            });
+
+            const chat = await res.json();
+            setCurrentChat(chat);
         };
-        showChats();
-    }, [userToChatDetail?.username, loginUser, userToChat, HOST, currentChat]);
+
+        startChat();
+    }, [userToChatDetail, HOST, loginUser, userToChat]);
 
 
     // ADD IT RIGHT HERE
     useEffect(() => {
-        setMessages([]);
+        if (!currentChat) return;
+        setMessages([]); // optional but safe now
     }, [currentChat]);
 
 
@@ -98,59 +77,68 @@ const Chat = ({ HOST, navigate }) => {
         if (!currentChat?._id) return;
 
         const fetchMessages = async () => {
-            try {
-                console.log("Fetching old messages...");
+            const res = await fetch(`${HOST}/chat/${currentChat._id}`);
+            const data = await res.json();
 
-                const response = await fetch(`${HOST}/chat/${currentChat._id}`);
+            const formatted = data.map(msg => ({
+                ...msg,
+                chatId: currentChat._id
+            }));
 
-                if (response.ok) {
-                    const data = await response.json();
-                    console.log("Old messages:", data);
-
-                    // IMPORTANT: attach chatId to each message
-                    const formattedMessages = data.map(msg => ({
-                        ...msg,
-                        chatId: currentChat._id
-                    }));
-
-                    setMessages(formattedMessages);
-                }
-            } catch (error) {
-                console.error(error);
-            }
+            setMessages(formatted);
         };
 
         fetchMessages();
     }, [currentChat, HOST]);
 
-    // 5. WebSocket Connection
+
+
+    // 🔥 5. WebSocket with RECONNECT (CRITICAL FIX)
     useEffect(() => {
-        if (socketRef.current) return; // prevent multiple connections
+        let socket;
 
-        socketRef.current = socket
+        const connect = () => {
+            socket = new WebSocket(process.env.REACT_APP_WS_URL);
+            socketRef.current = socket;
 
-        socketRef.current.onopen = () => {
-            console.log("WebSocket Connected");
+            socket.onopen = () => {
+                console.log("✅ WS Connected");
+
+                // 🔥 REGISTER USER (VERY IMPORTANT)
+                socket.send(JSON.stringify({
+                    type: "register",
+                    userId: loginUser
+                }));
+            };
+
+            socket.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+
+                console.log("📩 Received:", data);
+
+                // 🔥 Only update current chat
+                if (data.chatId === currentChat?._id) {
+                    setMessages(prev => [...prev, data]);
+                }
+            };
+
+            socket.onclose = () => {
+                console.log("❌ WS Disconnected → Reconnecting...");
+                setTimeout(connect, 2000); // 🔁 reconnect
+            };
+
+            socket.onerror = (err) => {
+                console.log("WS Error:", err);
+                socket.close();
+            };
         };
 
-        socketRef.current.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-
-            console.log("Received:", data);
-
-            setMessages(prev => [...prev, data]); // DON'T filter here
-        };
-
-        socketRef.current.onclose = () => {
-            console.log("WebSocket Disconnected");
-        };
+        connect();
 
         return () => {
-            socketRef.current?.close();
-            socketRef.current = null;
+            socket?.close();
         };
-    }, []);
-
+    }, [loginUser, currentChat]);
 
 
 
@@ -170,20 +158,19 @@ const Chat = ({ HOST, navigate }) => {
                 setIsFirstScroll(false);
             }, 300);
         }
-    }, [messages, isFirstScroll]);
+    }, [messages, isFirstScroll, currentChat]);
 
     // 7. Send Message via WebSocket
     const sendMessage = () => {
         if (!newMessage.trim()) return;
         if (!socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) return;
 
-        const messageData = {
+        socketRef.current.send(JSON.stringify({
             chatId: currentChat._id,
             sender: loginUser,
+            receiverId: userToChat, // 🔥 IMPORTANT
             message: newMessage
-        };
-
-        socketRef.current.send(JSON.stringify(messageData));
+        }));
 
         setNewMessage('');
     };
