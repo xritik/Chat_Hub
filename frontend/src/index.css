@@ -429,6 +429,9 @@ nav {
   font-size: 27px;
   transition: 0.4s;
 }
+.sendButton :disabled{
+  color: rgb(162, 255, 162);
+}
 
 .sendButton:hover {
   background-color: green;

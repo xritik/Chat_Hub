@@ -1,13 +1,13 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import male from '../imgs/male.jpg';
 import female from '../imgs/female.jpg';
-
+ 
 const Chat = ({ HOST, navigate }) => {
     const loginUser = localStorage.getItem('loginUser');
     const userToChat = localStorage.getItem('storedUserToChat');
-
-    // const [currentChat, setCurrentChat] = useState(() => JSON.parse(localStorage.getItem('currentChat')) || null);
+ 
+    const [isSocketReady, setIsSocketReady] = useState(false);
     const [currentChat, setCurrentChat] = useState(null);
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
@@ -16,20 +16,31 @@ const Chat = ({ HOST, navigate }) => {
     const [allUsers, setAllUsers] = useState([]);
     const [errorMessage, setErrorMessage] = useState('');
     const [isFirstScroll, setIsFirstScroll] = useState(true);
-
+ 
     const socketRef = useRef(null);
     const chatContainerRef = useRef(null);
     const messagesEndRef = useRef(null);
-
-
+ 
+    // KEY FIX: always-fresh ref to currentChat._id so WS closure never goes stale
+    const currentChatRef = useRef(null);
+ 
+    // Keep the ref in sync whenever currentChat changes
+    useEffect(() => {
+        currentChatRef.current = currentChat;
+    }, [currentChat]);
+ 
+ 
+    // 1. Restore currentChat from localStorage on first mount
     useEffect(() => {
         const storedChat = localStorage.getItem('currentChat');
-        if (storedChat && !currentChat) {
-            setCurrentChat(JSON.parse(storedChat));
+        if (storedChat) {
+            try {
+                setCurrentChat(JSON.parse(storedChat));
+            } catch {}
         }
-    }, [currentChat]);
-
-    // 1. Fetch all users
+    }, []);
+ 
+    // 2. Fetch all users
     useEffect(() => {
         const fetchUsers = async () => {
             const res = await fetch(`${HOST}/users`);
@@ -38,184 +49,178 @@ const Chat = ({ HOST, navigate }) => {
         };
         fetchUsers();
     }, [HOST]);
-
-    // 2. Find selected user
+ 
+    // 3. Find selected user from allUsers
     useEffect(() => {
         const matched = allUsers.find(u => u.username === userToChat);
-        if (matched){
+        if (matched) {
             setUserToChatDetail(matched);
             setIsLoading(false);
         }
     }, [allUsers, userToChat]);
-
-    // 3. Start chat
+ 
+    // 4. Start (or resume) chat once we have the target user
     useEffect(() => {
         if (!userToChatDetail.username) return;
-
+ 
         const startChat = async () => {
             try {
-                setErrorMessage(""); // clear old errors if any
-
+                setErrorMessage('');
+ 
                 const res = await fetch(`${HOST}/chat/start`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ loginUser, userToChat })
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ loginUser, userToChat }),
                 });
-
+ 
                 if (!res.ok) {
                     const errorData = await res.json();
-                    throw new Error(errorData.message || "Failed to start chat");
+                    throw new Error(errorData.message || 'Failed to start chat');
                 }
-
+ 
                 const chat = await res.json();
                 setCurrentChat(chat);
-
+                localStorage.setItem('currentChat', JSON.stringify(chat));
+ 
             } catch (error) {
-                setErrorMessage(error.message || "Something went wrong while starting chat");
+                setErrorMessage(error.message || 'Something went wrong while starting chat');
             }
         };
-
+ 
         startChat();
     }, [userToChatDetail, HOST, loginUser, userToChat]);
-
-
-    // ADD IT RIGHT HERE
-    useEffect(() => {
-        if (!currentChat) return;
-        setMessages([]); // optional but safe now
-    }, [currentChat]);
-
-
-    // 4. Fetch old messages (ONLY ONCE)
+ 
+    // 5. Fetch message history whenever chatId changes
     useEffect(() => {
         if (!currentChat?._id) return;
-
+ 
+        // Clear old messages immediately so stale data isn't shown
+        setMessages([]);
+        setIsFirstScroll(true);
+ 
         const fetchMessages = async () => {
             const res = await fetch(`${HOST}/chat/${currentChat._id}`);
             const data = await res.json();
-
+ 
             const formatted = data.map(msg => ({
                 ...msg,
                 chatId: currentChat._id,
-                timestamp: msg.timestamp || new Date() // ✅ fallback fix
+                timestamp: msg.timestamp || new Date().toISOString(),
             }));
-
+ 
             setMessages(formatted);
         };
-
+ 
         fetchMessages();
-    }, [currentChat, HOST]);
-
-
-
-    // 🔥 5. WebSocket with RECONNECT (CRITICAL FIX)
+    }, [currentChat?._id, HOST]);
+ 
+ 
+    // 6. WebSocket — connect ONCE per session, never re-connect on chat switch
+    //    Uses currentChatRef so onmessage always has the latest chatId.
     useEffect(() => {
         let socket;
-
+        let destroyed = false;
+ 
         const connect = () => {
             socket = new WebSocket(process.env.REACT_APP_WS_URL);
             socketRef.current = socket;
-
+            setIsSocketReady(false);
+ 
             socket.onopen = () => {
-                console.log("✅ WS Connected");
-
-                socket.send(JSON.stringify({
-                    type: "register",
-                    userId: loginUser
-                }));
+                if (destroyed) return;
+                console.log('✅ WS Connected');
+                setIsSocketReady(true);
+                socket.send(JSON.stringify({ type: 'register', userId: loginUser }));
             };
-
+ 
             socket.onmessage = (event) => {
-                const data = JSON.parse(event.data);
-
-                console.log("📩 Received:", data);
-
-                // ✅ IMPORTANT FIX: use functional update + check safely
-                setMessages(prev => {
-                    // only push if belongs to current chat
-                    if (data.chatId === currentChat?._id) {
+                try {
+                    const data = JSON.parse(event.data);
+                    const activeChatId = currentChatRef.current?._id;
+ 
+                    // Only add if message belongs to the currently open chat
+                    if (!data.chatId || data.chatId !== activeChatId) return;
+ 
+                    setMessages(prev => {
+                        // Deduplicate: if we already have this msgId, skip
+                        if (data.msgId && prev.some(m => m.msgId === data.msgId)) {
+                            return prev;
+                        }
                         return [...prev, data];
-                    }
-                    return prev;
-                });
+                    });
+                } catch (err) {
+                    console.error('❌ WS message parse error:', err);
+                }
             };
-
+ 
             socket.onclose = () => {
-                console.log("❌ WS Disconnected → Reconnecting...");
-                setTimeout(connect, 2000);
+                console.log('❌ WS Disconnected');
+                setIsSocketReady(false);
+                if (!destroyed) {
+                    setTimeout(connect, 2000);
+                }
             };
-
-            socket.onerror = (err) => {
-                console.log("WS Error:", err);
+ 
+            socket.onerror = () => {
                 socket.close();
             };
         };
-
+ 
         connect();
-
+ 
         return () => {
+            destroyed = true;
             socket?.close();
         };
-    }, [loginUser, currentChat?._id]); // ❌ removed currentChat
-
-
-
-
-
-    // 6. Auto Scroll
+    }, [loginUser]); // intentionally only loginUser — never currentChat._id
+ 
+ 
+    // 7. Auto-scroll to newest message
     useEffect(() => {
         const chatContainer = chatContainerRef.current;
         if (!chatContainer) return;
-
+ 
         const isNearBottom =
             chatContainer.scrollHeight - chatContainer.scrollTop <= chatContainer.clientHeight + 50;
-
+ 
         if (isFirstScroll || isNearBottom) {
             setTimeout(() => {
-                messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+                messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
                 setIsFirstScroll(false);
-            }, 300);
+            }, 100);
         }
-    }, [messages, isFirstScroll, currentChat]);
-
-    // 7. Send Message via WebSocket
+    }, [messages, isFirstScroll]);
+ 
+ 
+    // 8. Send message via WebSocket
     const sendMessage = () => {
         if (!newMessage.trim()) return;
-
+ 
         const socket = socketRef.current;
-
         if (!socket || socket.readyState !== WebSocket.OPEN) {
-            console.log("❌ Socket not connected");
+            console.warn('❌ Socket not ready');
             return;
         }
-
+ 
+        if (!currentChat?._id) return;
+ 
         const messageData = {
             chatId: currentChat._id,
             sender: loginUser,
             receiverId: userToChat,
             message: newMessage,
-            timestamp: new Date().toISOString() 
+            timestamp: new Date().toISOString(),
         };
-
+ 
         socket.send(JSON.stringify(messageData));
-
-        // ✅ optional: optimistic UI update (instant message)
-        setMessages(prev => [...prev, messageData]);
-
         setNewMessage('');
     };
-
+ 
     const formatTime = (timestamp) => {
-        if (!timestamp) return "";
-
+        if (!timestamp) return '';
         const date = new Date(timestamp);
-
-        if (isNaN(date.getTime())) return ""; // ❌ prevents "Invalid Date"
-
-        return date.toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit"
-        });
+        if (isNaN(date.getTime())) return '';
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     };
 
   return (
@@ -269,7 +274,7 @@ const Chat = ({ HOST, navigate }) => {
                                 className="messageInput"
                                 />
                                 {/* <button onClick={sendMessage} className="sendButton">Send</button> */}
-                                <span className='sendButton'><i className='bx bxs-send' type='button' onClick={sendMessage}></i></span>
+                                <span className='sendButton' disabled={!isSocketReady}><i className='bx bxs-send' type='button' onClick={sendMessage}></i></span>
                             </form>
                             
                         </div>
