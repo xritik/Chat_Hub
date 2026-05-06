@@ -4,6 +4,7 @@ const express = require('express');
 const cors = require('cors');
 const http = require("http");
 const WebSocket = require("ws");
+const { randomUUID } = require('crypto');
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -11,11 +12,7 @@ require('./db');
 
 const Chat = require('./models/chats');
 
-const corsOptions = {
-    origin: '*',
-};
-
-app.use(cors(corsOptions));
+app.use(cors({ origin: '*' }));
 app.use(express.json());
 
 // Routes
@@ -25,19 +22,15 @@ app.use('/dashboard', require('./routes/dashboardRoutes'));
 app.use('/chat', require('./routes/chatRoutes'));
 app.use('/users', require('./routes/userRoutes'));
 
-// 🔥 CREATE HTTP SERVER
 const server = http.createServer(app);
-
-// 🔥 WEBSOCKET SERVER
 const wss = new WebSocket.Server({ server });
 
-// 🔥 Store connected clients
-let clients = {}; // userId -> ws
+// Store connected users: userId -> ws
+let clients = {};
 
 wss.on("connection", (ws) => {
     console.log("✅ New WebSocket connection");
 
-    // 💓 Heartbeat (detect dead connections)
     ws.isAlive = true;
 
     ws.on("pong", () => {
@@ -48,25 +41,33 @@ wss.on("connection", (ws) => {
         try {
             const data = JSON.parse(message);
 
-            // ✅ 1. Register user
+            // ============================
+            // REGISTER USER
+            // ============================
             if (data.type === "register") {
                 const { userId } = data;
 
-                // ❗ If user already connected → close old socket
+                if (!userId) {
+                    console.log("⚠️ Register missing userId");
+                    return;
+                }
+
+                // Close old connection if exists
                 if (clients[userId] && clients[userId] !== ws) {
-                    try {
-                        clients[userId].close();
-                    } catch (e) {}
+                    try { clients[userId].terminate(); } catch {}
                 }
 
                 clients[userId] = ws;
                 ws.userId = userId;
 
-                console.log(`🟢 User registered: ${userId}`);
-                console.log("👥 Active users:", Object.keys(clients));
+                console.log(`🟢 Registered: ${userId}`);
+                console.log("👥 Active:", Object.keys(clients));
                 return;
             }
 
+            // ============================
+            // SEND MESSAGE
+            // ============================
             const { chatId, sender, receiverId, message: text } = data;
 
             if (!chatId || !sender || !receiverId || !text) {
@@ -74,14 +75,17 @@ wss.on("connection", (ws) => {
                 return;
             }
 
-            // ✅ 2. Save message
             const chat = await Chat.findById(chatId);
             if (!chat) {
                 console.log("❌ Chat not found:", chatId);
                 return;
             }
 
+            // Generate a unique ID for this message so the frontend can deduplicate
+            const msgId = randomUUID();
+
             const newMessage = {
+                msgId,
                 sender,
                 message: text,
                 timestamp: new Date().toISOString(),
@@ -91,38 +95,43 @@ wss.on("connection", (ws) => {
             await chat.save();
 
             const payload = JSON.stringify({
+                msgId,
                 chatId,
                 sender,
                 message: text,
-                timestamp: newMessage.timestamp
+                timestamp: newMessage.timestamp,
             });
 
-            // ✅ helper function (safe send)
-            const safeSend = (client, label) => {
+            // ============================
+            // SAFE SEND FUNCTION
+            // ============================
+            const sendIfOnline = (userId) => {
+                const client = clients[userId];
                 if (client && client.readyState === WebSocket.OPEN) {
                     client.send(payload);
+                    console.log(`📤 Sent to ${userId}`);
                 } else {
-                    console.log(`⚠️ ${label} socket not available`);
+                    console.log(`⚠️ ${userId} not online`);
                 }
             };
 
-            // ✅ 3. Send to receiver
-            safeSend(clients[receiverId], "Receiver");
-
-            // ✅ 4. Send to sender
-            safeSend(clients[sender], "Sender");
+            // Send to both participants
+            sendIfOnline(receiverId);
+            sendIfOnline(sender);
 
         } catch (err) {
             console.error("❌ WS Error:", err);
         }
     });
 
-    // ✅ 5. Cleanup on disconnect
+    // ============================
+    // CLEANUP ON DISCONNECT
+    // ============================
     ws.on("close", () => {
         if (ws.userId && clients[ws.userId] === ws) {
             delete clients[ws.userId];
-            console.log(`❌ User disconnected: ${ws.userId}`);
-            console.log("👥 Active users:", Object.keys(clients));
+            console.log(`❌ Disconnected: ${ws.userId}`);
+            console.log("👥 Active:", Object.keys(clients));
         }
     });
 
@@ -132,21 +141,24 @@ wss.on("connection", (ws) => {
 });
 
 
-// 💓 Ping clients every 30 sec (detect dead sockets)
+// ============================
+// HEARTBEAT — kill dead sockets
+// ============================
 setInterval(() => {
     wss.clients.forEach((ws) => {
         if (!ws.isAlive) {
-            console.log("💀 Terminating dead socket");
+            console.log("💀 Killing dead socket");
             return ws.terminate();
         }
-
         ws.isAlive = false;
         ws.ping();
     });
 }, 30000);
 
 
-// 🚀 START SERVER
+// ============================
+// START SERVER
+// ============================
 server.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
 });
