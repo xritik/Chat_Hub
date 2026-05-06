@@ -3,7 +3,7 @@
 A full-stack, real-time private messaging app built with the MERN stack and WebSockets, featuring instant one-on-one communication, live connection management, and persistent message history.
 <br>
 
-## 🔴 Live [here](https://richat7.vercel.app).
+## 🔴 Now RiChat App is Live [here](https://richat7.vercel.app).
 <br>
 
 ## 🚀 Features
