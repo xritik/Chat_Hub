@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import male from '../imgs/male.jpg';
 import female from '../imgs/female.jpg';
 
-const Dashboard = ({ HOST, navigate, setSignupMessage, loginUser, logout }) => {
+const Dashboard = ({ HOST, navigate, setSignupMessage, isUsersListed, setIsUsersListed, loginUser, logout }) => {
     const [fullname, setFullname] = useState('');
     const [isLoading, setIsLoading] = useState(true);
     const [allUsers, setAllUsers] = useState([]);
@@ -12,6 +12,11 @@ const Dashboard = ({ HOST, navigate, setSignupMessage, loginUser, logout }) => {
     const [showButton, SetShowButton] = useState(true);
 
     const savedLoginUser = localStorage.getItem('loginUser')
+
+    useEffect(() => {
+        if (!isUsersListed) return;
+        fetchUsers();
+    }, [isUsersListed]);
 
 
     useEffect(() => {
@@ -69,6 +74,8 @@ const Dashboard = ({ HOST, navigate, setSignupMessage, loginUser, logout }) => {
                     setAllUsers(users);
                     setIsUsersLoading(false);
                     SetShowButton(false);
+                    localStorage.setItem('isUsersListed', 'true');
+                    setIsUsersListed(true);
                 }, 2000); // Longer delay for first load, shorter for subsequent loads
             } else {
                 setIsUsersLoading(false);
@@ -98,6 +105,26 @@ const Dashboard = ({ HOST, navigate, setSignupMessage, loginUser, logout }) => {
         // }, 2000);
     }
 
+    const handleDeleteUser = async (username) => {
+        const confirmed = window.confirm(`Are you sure you want to delete "${username}"?`);
+        if (!confirmed) return;
+
+        try {
+            const res = await fetch(`${HOST}/users/${username}`, {
+                method: 'DELETE',
+            });
+
+            if (!res.ok) throw new Error('Failed to delete user');
+
+            // Remove from UI instantly
+            setAllUsers(prev => prev.filter(u => u.username !== username));
+
+        } catch (err) {
+            console.error('Delete error:', err);
+            alert('Something went wrong while deleting the user.');
+        }
+    };
+
 
     return (
         <div>
@@ -116,8 +143,8 @@ const Dashboard = ({ HOST, navigate, setSignupMessage, loginUser, logout }) => {
                 {isLoading && <p className='loading'>Loading...</p>}
                 {!isLoading && (
                     <>
-                        <p className='para' style={{paddingTop: '30px'}}>This desktop application serves as a user-friendly chatting platform designed for registered users to connect and communicate with one another.</p>
-                        <p className='para' style={{marginTop: '-7px'}}>So just click on '<b>Chat with others</b>' and get some registered sweet people like you to chat.</p>
+                        <p className='para' style={{paddingTop: '30px', textAlign:'center'}}>This desktop application serves as a user-friendly chatting platform designed for registered users to connect and communicate with one another.</p>
+                        <p className='para' style={{marginTop: '-7px', textAlign:'center'}}>So just click on '<b>Chat with others</b>' and get some registered sweet people like you to chat.</p>
                         {showButton && <div className='button-div'><button className='dashboard-button' onClick={fetchUsers}>Chat with others</button></div>}
                         {message && <p style={{marginTop: '15px', textAlign: 'center'}}>{message}</p>}
                         {isUsersLoading && <p style={{marginTop: '10px', textAlign: 'center'}}>Loading Users...</p>}
@@ -137,7 +164,15 @@ const Dashboard = ({ HOST, navigate, setSignupMessage, loginUser, logout }) => {
                                                     <span className="username"><i>{user.username}</i></span>
                                                 </div>
                                             </div>
-                                            <button className="chat-button" onClick={() => handleToChat(user.username)}>Chat</button>
+                                            <div style={{display:'flex', alignItems:'center', justifyContent:'center', gap:'27px'}}>
+                                                <button className="chat-button" onClick={() => handleToChat(user.username)}>Chat</button>
+                                                {loginUser === 'ritik' &&
+                                                    <div className="icons">
+                                                        <i className="bx bx-trash delete-icon" style={{color:'red'}} onClick={() => handleDeleteUser(user.username)}/>
+                                                        <i className="bx bx-edit edit-icon" style={{color:'green'}}/>
+                                                    </div>
+                                                }
+                                            </div>
                                         </li>
                                     ))}
                                 </ul>

@@ -14,6 +14,7 @@ const SignUp = ({ HOST, signupMessage, setLoginUser, navigate}) => {
   // localStorage.removeItem('loginUser')
   const signUp = async () => {
     try{
+        setIsSignedIn(true);
       const response = await fetch(`${HOST}/signup`, {
         method: 'POST',
         headers: {
@@ -27,12 +28,14 @@ const SignUp = ({ HOST, signupMessage, setLoginUser, navigate}) => {
         setLoginUser(username)
         navigate('/dashboard')
       }else{
-        setMessage(data.message)
+        setMessage(data.message);
+        setIsSignedIn(false);
       }
     }
     catch (err){
       console.log('Error in SignIn', err);
-      setMessage('An error occurred, Please try again')
+      setMessage('An error occurred, Please try again');
+      setIsSignedIn(false);
     }
   }
 
@@ -110,7 +113,7 @@ const SignUp = ({ HOST, signupMessage, setLoginUser, navigate}) => {
                     />
                 </div>
         
-                <button type="submit" className='submitbutton' disabled={!isSignedIn}>SignUp</button>
+                <button type="submit" className='submitbutton' disabled={isSignedIn}>SignUp</button>
             <div>Already exist an account? <Link to={'/login'}> Login</Link></div>
             </form>
                 {message && <p style={{marginTop: '10px'}}>{message}</p>}

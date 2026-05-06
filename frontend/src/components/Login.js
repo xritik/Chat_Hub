@@ -11,6 +11,7 @@ const Login = ({ HOST, signupMessage, navigate, setLoginUser }) => {
 //   localStorage.removeItem('loginUser')
   const login = async () => {
     try {
+        setIsLoggedIn(true)
         const response = await fetch(`${HOST}/login`, {
             method: 'POST',
             headers: {
@@ -27,10 +28,12 @@ const Login = ({ HOST, signupMessage, navigate, setLoginUser }) => {
             navigate('/dashboard');
         } else {
             setMessage(data.message);  // Error message
+            setIsLoggedIn(false);
         }
     } catch (error) {
         console.error("Error logging in:", error);
         setMessage('An error occurred. Please try again.');
+        setIsLoggedIn(false);
     }
   };
 

@@ -12,4 +12,14 @@ router.get('/', async (req, res) => {
     }
 });
 
+router.delete('/:username', async (req, res) => {
+    try {
+        const { username } = req.params;
+        await User.findOneAndDelete({ username });
+        res.json({ message: 'User deleted successfully' });
+    } catch (err) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
 module.exports = router;

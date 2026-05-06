@@ -194,10 +194,28 @@ nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 60px;
-  gap: 150px;
+  padding: 15px 50px;
+  gap: 120px;
   border-bottom: 1px solid #e0e0e0;
   transition: background-color 0.3s ease;
+}
+.icons{
+  display: flex;
+  gap: 10px;
+}
+.delete-icon, .edit-icon{
+  border-radius: 50%;
+  padding: 6px;
+  font-size: 26px;
+}
+.delete-icon:hover, .edit-icon:hover{
+  cursor: pointer;
+  background-color: #cccccc;
+  transition: .3s;
+}
+.delete-icon:active, .edit-icon:active{
+  scale: .8;
+  transition: .3s;
 }
 
 .user-item:last-child {

@@ -5,13 +5,14 @@ import SignUp from './components/SignUp'
 import Dashboard from './components/Dashboard'
 import Missing from './components/Missing';
 import Chat from './components/Chat';
-// const HOST = process.env.REACT_APP_API_URL;
+const HOST = process.env.REACT_APP_API_URL;
 
 function App() {
   const navigate = useNavigate();
   const [signupMessage, setSignupMessage] = useState('');
   const [loginUser, setLoginUser] = useState(localStorage.getItem('loginUser') || '');
-  const HOST = `${window.location.protocol}//${window.location.hostname}:8080`;
+  const [isUsersListed, setIsUsersListed] = useState(localStorage.getItem('isUsersListed') || false);
+  // const HOST = `${window.location.protocol}//${window.location.hostname}:8080`;
   console.log(loginUser);
 
 
@@ -32,6 +33,8 @@ function App() {
     localStorage.removeItem('currentChat');
     localStorage.removeItem('storedAllUsers');
     localStorage.removeItem('storedUserToChat');
+    localStorage.removeItem('isUsersListed');
+    setIsUsersListed(false);
   };
 
 
@@ -41,7 +44,7 @@ function App() {
         <Route path="/" element={<SignUp HOST={HOST} navigate={navigate} signupMessage={signupMessage} setLoginUser={setLoginUser} />} />
         <Route path="/signup" element={<SignUp HOST={HOST} navigate={navigate} signupMessage={signupMessage} setLoginUser={setLoginUser} />} />
         <Route path="/login" element={<Login HOST={HOST} navigate={navigate} signupMessage={signupMessage} setLoginUser={setLoginUser} />} />
-        <Route path="/dashboard" element={<Dashboard HOST={HOST} navigate={navigate} setSignupMessage={setSignupMessage} loginUser={loginUser} logout={logout} />} />
+        <Route path="/dashboard" element={<Dashboard HOST={HOST} navigate={navigate} setSignupMessage={setSignupMessage} isUsersListed={isUsersListed} setIsUsersListed={setIsUsersListed} loginUser={loginUser} logout={logout} />} />
         <Route path="/chat" element={<Chat HOST={HOST} navigate={navigate} />} />
         <Route path='*' element={<Missing />} />
       </Routes>
