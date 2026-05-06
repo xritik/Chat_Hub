@@ -5,13 +5,13 @@ import SignUp from './components/SignUp'
 import Dashboard from './components/Dashboard'
 import Missing from './components/Missing';
 import Chat from './components/Chat';
-const HOST = process.env.REACT_APP_API_URL;
+// const HOST = process.env.REACT_APP_API_URL;
 
 function App() {
   const navigate = useNavigate();
   const [signupMessage, setSignupMessage] = useState('');
   const [loginUser, setLoginUser] = useState(localStorage.getItem('loginUser') || '');
-  // const HOST = `${window.location.protocol}//${window.location.hostname}:8080`;
+  const HOST = `${window.location.protocol}//${window.location.hostname}:8080`;
   console.log(loginUser);
 
 

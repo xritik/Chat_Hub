@@ -90,6 +90,10 @@ input {
 .submitbutton:active{
   scale: .9;
 }
+.submitbutton:disabled{
+  background-color: #a6e9a8;
+  cursor: not-allowed;
+}
 nav {
   height: 60px;
   width: 100vw;
@@ -431,6 +435,7 @@ nav {
 }
 .sendButton :disabled{
   color: rgb(162, 255, 162);
+  cursor: not-allowed;
 }
 
 .sendButton:hover {

@@ -6,6 +6,7 @@ const Login = ({ HOST, signupMessage, navigate, setLoginUser }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
 //   localStorage.removeItem('loginUser')
   const login = async () => {
@@ -71,7 +72,7 @@ const Login = ({ HOST, signupMessage, navigate, setLoginUser }) => {
                     />
                 </div>
 
-                <button type="submit" className='submitbutton'>Login</button>
+                <button type="submit" className='submitbutton' disabled={isLoggedIn}>Login</button>
                 <div>Create new account? <Link to={'/signup'}> Sign up</Link></div>
             </form>
 
