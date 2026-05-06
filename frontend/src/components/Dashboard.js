@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import male from '../imgs/male.jpg';
 import female from '../imgs/female.jpg';
 
@@ -49,7 +49,7 @@ const Dashboard = ({ HOST, navigate, setSignupMessage, isUsersListed, setIsUsers
     }, [navigate, setSignupMessage, loginUser, savedLoginUser, HOST]); // Include all dependencies in the dependency array.
     
     
-    const fetchUsers = async () => {
+    const fetchUsers = useCallback(async () => {
         localStorage.removeItem('currentChat');
         localStorage.removeItem('storedAllUsers');
         localStorage.removeItem('storedUserToChat');
@@ -72,32 +72,27 @@ const Dashboard = ({ HOST, navigate, setSignupMessage, isUsersListed, setIsUsers
                     SetShowButton(false);
                     localStorage.setItem('isUsersListed', 'true');
                     setIsUsersListed(true);
-                }, 2000); // Longer delay for first load, shorter for subsequent loads
+                }, 2000);
             } else {
                 setIsUsersLoading(false);
                 setMessage('Users not found, Please try again!!');
                 SetShowButton(true);
                 setAllUsers([]);
-                setTimeout(() => {
-                    setMessage('');
-                }, 5000);
+                setTimeout(() => setMessage(''), 5000);
             }
         } catch {
             setIsUsersLoading(false);
             setMessage('Something went wrong! Please try again!!');
             SetShowButton(true);
             setAllUsers([]);
-            setTimeout(() => {
-                setMessage('');
-            }, 5000);
+            setTimeout(() => setMessage(''), 5000);
         }
-    };    
-    
+    }, [HOST, loginUser]);
+
     useEffect(() => {
         if (!isUsersListed) return;
         fetchUsers();
-    }, [isUsersListed]);
-
+    }, [isUsersListed, fetchUsers]);
     
     const handleToChat = (userToChat) => {
         localStorage.setItem('storedUserToChat', userToChat);
