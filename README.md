@@ -1,17 +1,18 @@
-# 💬 ChatHub - MERN Real-Time Chat App
+# 💬 ChatHub — Real-Time Chat Application
 
-A full-stack real-time chat application built with the **MERN stack** (MongoDB, Express.js, React.js, Node.js). Users can register, log in, view all other registered users, and initiate one-on-one private chats.
+A full-stack, real-time private messaging app built with the MERN stack and WebSockets, featuring instant one-on-one communication, live connection management, and persistent message history.
 <br>
 <br>
 
 ## 🚀 Features
 
-- ✅ User Registration & Login (with validation)
-- ✅ Private One-on-One Messaging
-- ✅ Real-Time Communication
-- ✅ User List with "Chat" Buttons
-- ✅ MongoDB for Data Persistence
-- ✅ Simple, Responsive UI
+- ✅ User registration and login with input validation
+- ✅ Instant one-on-one chat powered by WebSocket
+- ✅ Browse all registered users and initiate chats
+- ✅ All messages stored in MongoDB and loaded on open
+- ✅ WebSocket client reconnects automatically on drop
+- ✅ Server-side ping/pong to detect and clean dead connections
+- ✅ Clean, mobile-friendly interface
 <br>
 <br>
 
@@ -29,30 +30,7 @@ A full-stack real-time chat application built with the **MERN stack** (MongoDB, 
 - **Chatting Page**
 <img src="frontend/src/imgs/Chat_Hub_Chatting.png">
 
-## 📂 Folder Structure
 
-Chat_Hub/                                              <br>
-│                                                      <br>
-├── frontend/       # React frontend                   <br>
-│ ├── public/                                          <br>
-│ └── src/                                             <br>
-│   ├── components/                                    <br>
-│   ├── imgs/                                          <br>
-│   ├── App.js                                         <br>
-│   └── index.js                                       <br>
-│   └── index.css                                      <br>
-│ └── package.json  # Frontend metadata and scripts    <br>
-│                                                      <br>
-├── backend/        # Express backend                  <br>
-│ ├── models/       # Mongoose schemas                 <br>
-│ ├── routes/       # API endpoints                    <br>
-│ ├── db.js         # Database connection              <br>
-│ ├── package.json  # Backend metadata and scripts     <br>
-│ └── server.js     # Entry point                      <br>
-│                                                      <br>
-├── .gitignore                                         <br>
-├── package.json    # Project metadata and scripts     <br>
-└── README.md       # You're reading it!               <br>
 <br>
 <br>
 
@@ -61,16 +39,64 @@ Chat_Hub/                                              <br>
 **Frontend:**
 
 - React.js
+- React Router
+- WebSocket API (native)
 - HTML/CSS
 
 **Backend:**
 
 - Node.js
 - Express.js
-- MongoDB with Mongoose
+- ws
+- MongoDB + Mongoose
+- dotenv
+- cors
 
 <br>
 <br>
+
+## 📂 Folder Structure
+
+Chat_Hub/                                                <br>
+│                                                        <br>
+├── backend/          # Express backend                  <br>
+│   ├── models/       # API endpoints                    <br>
+│   │   ├── chats.js                                <br>
+│   │   └── users.js                           <br>
+│   ├── routes/       # Mongoose schemas                 <br>
+│   │   ├── chatRoutes.js                                <br>
+│   │   ├── dashboardRoutes.js                           <br>
+│   │   ├── loginRoutes.js                               <br>
+│   │   ├── signupRoutes.js                              <br>
+│   │   └── userRoutes.js                                <br>
+│   ├── .env          # For environment variable         <br>
+│   ├── db.js         # Database connection              <br>
+│   ├── package.json  # Backend metadata and scripts     <br>
+│   └── server.js     # Entry point                      <br>
+│                                                        <br>
+│                                                        <br>
+├── frontend/       # React frontend                     <br>
+│   ├── public/                                          <br>
+│   ├── src/                                             <br>
+│   │   ├── components/                                  <br>
+│   │   │   ├── Chat.js                                  <br>
+│   │   │   ├── Dashboard.js                             <br>
+│   │   │   ├── Login.js                                 <br>
+│   │   │   ├── Missing.js                               <br>
+│   │   │   └── SignUp.js                                <br>
+│   │   ├── imgs/                                        <br>
+│   │   ├── App.js                                       <br>
+│   │   └── index.js                                     <br>
+│   │   └── index.css                                    <br>
+│   ├── package.json  # Frontend metadata and scripts    <br>
+│   └── .env          # For environment variable         <br>
+│                                                        <br>
+├── .gitignore                                           <br>
+├── package.json    # Project metadata and scripts       <br>
+└── README.md       # You're reading it!                 <br>
+<br>
+<br>
+
 
 ## 🧱 Required Tech Stack & their Versions
 
@@ -87,6 +113,10 @@ Chat_Hub/                                              <br>
     <tr>
       <td>MongoDB</td>
       <td>8.0.1</td>
+    </tr>
+    <tr>
+      <td>npm</td>
+      <td>Comes with Node.js</td>
     </tr>
   </tbody>
 </table>
@@ -113,37 +143,52 @@ cd Chat_Hub
 npm install
 ```
 
-- **Frontend:**
-
-```bash
-cd ../frontend
-npm install
-```
-
 - **Backend:**
 
 ```bash
 cd backend
 npm install
 ```
+
+- **Frontend:**
+
+```bash
+cd ../frontend
+npm install
+```
 <br>
 <br>
 
-**3. Run the Application**
+
+**3. Environment Variables**
+
+Backend — backend/.env
+```bash
+MONGO_URI=mongodb+srv://<username>:<password>@cluster0.xxxxx.mongodb.net/mydb?retryWrites=true&w=majority
+PORT=8080
+```
+
+Frontend — frontend/.env
+```bash
+REACT_APP_API_URL=https://chathub.onrender.com
+REACT_APP_WS_URL=wss://chathub.onrender.com
+```
+
+**4. Run the Application**
 ```bash
 cd ../
 npm start
 ```
+The app is [live here](https://richat7.vercel.app).
 <br>
 <br>
 
 ## 🌐 Usage:
 
+- Open https://richat7.vercel.app in your browser.
 - Register or login with an existing account.
-- Click "Chat with Others".
-- Select a user and start chatting in real-time!
+- From the dashboard, click "Chat with Others".
+- Select any registered user from the list.
+- Start sending messages in real time — both sides update instantly!
 <br>
 <br>
-
-## 👨‍💻 Author
-Developed with ❤️ by [Ritik](https://github.com/xritik).
