@@ -96,7 +96,7 @@ const Dashboard = ({ HOST, navigate, setSignupMessage, isUsersListed, setIsUsers
     useEffect(() => {
         if (!isUsersListed) return;
         fetchUsers();
-    }, [isUsersListed, fetchUsers]);
+    }, [isUsersListed]);
 
     
     const handleToChat = (userToChat) => {
