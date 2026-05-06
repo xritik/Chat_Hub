@@ -13,12 +13,8 @@ const Dashboard = ({ HOST, navigate, setSignupMessage, isUsersListed, setIsUsers
 
     const savedLoginUser = localStorage.getItem('loginUser')
 
-    useEffect(() => {
-        if (!isUsersListed) return;
-        fetchUsers();
-    }, [isUsersListed, fetchUsers]);
-
-
+    
+    
     useEffect(() => {
         const fetchUserData = async () => {
             try {
@@ -48,11 +44,11 @@ const Dashboard = ({ HOST, navigate, setSignupMessage, isUsersListed, setIsUsers
                 navigate('/login'); // Redirect to login on error
             }
         };
-    
+        
         fetchUserData();
     }, [navigate, setSignupMessage, loginUser, savedLoginUser, HOST]); // Include all dependencies in the dependency array.
-
-
+    
+    
     const fetchUsers = async () => {
         localStorage.removeItem('currentChat');
         localStorage.removeItem('storedAllUsers');
@@ -66,7 +62,7 @@ const Dashboard = ({ HOST, navigate, setSignupMessage, isUsersListed, setIsUsers
                     'login-user': loginUser,
                 }
             });
-    
+            
             if (response.ok) {
                 const data = await response.json();
                 const users = data.users || [];
@@ -96,7 +92,13 @@ const Dashboard = ({ HOST, navigate, setSignupMessage, isUsersListed, setIsUsers
             }, 5000);
         }
     };    
+    
+    useEffect(() => {
+        if (!isUsersListed) return;
+        fetchUsers();
+    }, [isUsersListed, fetchUsers]);
 
+    
     const handleToChat = (userToChat) => {
         localStorage.setItem('storedUserToChat', userToChat);
         // console.log(localStorage.getItem('storedUserToChat'));
