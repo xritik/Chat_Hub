@@ -128,7 +128,7 @@ const Chat = ({ HOST, navigate }) => {
  
             socket.onopen = () => {
                 if (destroyed) return;
-                console.log('✅ WS Connected');
+                console.log('WS Connected');
                 setIsSocketReady(true);
                 socket.send(JSON.stringify({ type: 'register', userId: loginUser }));
             };
@@ -149,12 +149,12 @@ const Chat = ({ HOST, navigate }) => {
                         return [...prev, data];
                     });
                 } catch (err) {
-                    console.error('❌ WS message parse error:', err);
+                    console.error('WS message parse error:', err);
                 }
             };
  
             socket.onclose = () => {
-                console.log('❌ WS Disconnected');
+                console.log('WS Disconnected');
                 setIsSocketReady(false);
                 if (!destroyed) {
                     setTimeout(connect, 2000);
@@ -198,7 +198,7 @@ const Chat = ({ HOST, navigate }) => {
  
         const socket = socketRef.current;
         if (!socket || socket.readyState !== WebSocket.OPEN) {
-            console.warn('❌ Socket not ready');
+            console.warn('Socket not ready');
             return;
         }
  
@@ -226,7 +226,7 @@ const Chat = ({ HOST, navigate }) => {
   return (
     <div>
         <nav>
-            <div className='chatBrand'>Chat.hub</div>
+            <div className='chatBrand'>RiChat</div>
         </nav>
         <div>
             <div className='chat-section'>
