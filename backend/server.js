@@ -29,7 +29,7 @@ const wss = new WebSocket.Server({ server });
 let clients = {};
 
 wss.on("connection", (ws) => {
-    console.log("✅ New WebSocket connection");
+    console.log("New WebSocket connection");
 
     ws.isAlive = true;
 
@@ -48,7 +48,7 @@ wss.on("connection", (ws) => {
                 const { userId } = data;
 
                 if (!userId) {
-                    console.log("⚠️ Register missing userId");
+                    console.log("Register missing userId");
                     return;
                 }
 
@@ -60,8 +60,8 @@ wss.on("connection", (ws) => {
                 clients[userId] = ws;
                 ws.userId = userId;
 
-                console.log(`🟢 Registered: ${userId}`);
-                console.log("👥 Active:", Object.keys(clients));
+                console.log(`Registered: ${userId}`);
+                console.log("Active:", Object.keys(clients));
                 return;
             }
 
@@ -71,13 +71,13 @@ wss.on("connection", (ws) => {
             const { chatId, sender, receiverId, message: text } = data;
 
             if (!chatId || !sender || !receiverId || !text) {
-                console.log("⚠️ Invalid message data:", data);
+                console.log("Invalid message data:", data);
                 return;
             }
 
             const chat = await Chat.findById(chatId);
             if (!chat) {
-                console.log("❌ Chat not found:", chatId);
+                console.log("Chat not found:", chatId);
                 return;
             }
 
@@ -109,9 +109,9 @@ wss.on("connection", (ws) => {
                 const client = clients[userId];
                 if (client && client.readyState === WebSocket.OPEN) {
                     client.send(payload);
-                    console.log(`📤 Sent to ${userId}`);
+                    console.log(`Sent to ${userId}`);
                 } else {
-                    console.log(`⚠️ ${userId} not online`);
+                    console.log(`${userId} not online`);
                 }
             };
 
@@ -120,7 +120,7 @@ wss.on("connection", (ws) => {
             sendIfOnline(sender);
 
         } catch (err) {
-            console.error("❌ WS Error:", err);
+            console.error("WS Error:", err);
         }
     });
 
@@ -130,13 +130,13 @@ wss.on("connection", (ws) => {
     ws.on("close", () => {
         if (ws.userId && clients[ws.userId] === ws) {
             delete clients[ws.userId];
-            console.log(`❌ Disconnected: ${ws.userId}`);
-            console.log("👥 Active:", Object.keys(clients));
+            console.log(`Disconnected: ${ws.userId}`);
+            console.log("Active:", Object.keys(clients));
         }
     });
 
     ws.on("error", (err) => {
-        console.log("⚠️ Socket error:", err.message);
+        console.log("Socket error:", err.message);
     });
 });
 
@@ -147,7 +147,7 @@ wss.on("connection", (ws) => {
 setInterval(() => {
     wss.clients.forEach((ws) => {
         if (!ws.isAlive) {
-            console.log("💀 Killing dead socket");
+            console.log("Killing dead socket");
             return ws.terminate();
         }
         ws.isAlive = false;
@@ -160,5 +160,5 @@ setInterval(() => {
 // START SERVER
 // ============================
 server.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });
