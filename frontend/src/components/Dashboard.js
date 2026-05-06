@@ -16,7 +16,7 @@ const Dashboard = ({ HOST, navigate, setSignupMessage, isUsersListed, setIsUsers
     useEffect(() => {
         if (!isUsersListed) return;
         fetchUsers();
-    }, [isUsersListed]);
+    }, [isUsersListed, fetchUsers]);
 
 
     useEffect(() => {
