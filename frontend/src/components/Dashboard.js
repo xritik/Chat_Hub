@@ -87,7 +87,7 @@ const Dashboard = ({ HOST, navigate, setSignupMessage, isUsersListed, setIsUsers
             setAllUsers([]);
             setTimeout(() => setMessage(''), 5000);
         }
-    }, [HOST, loginUser]);
+    }, [HOST, loginUser, setIsUsersListed]);
 
     useEffect(() => {
         if (!isUsersListed) return;
