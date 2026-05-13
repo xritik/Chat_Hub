@@ -172,8 +172,8 @@ PORT=8080
 
 Frontend — frontend/.env
 ```bash
-REACT_APP_API_URL=https://chathub.onrender.com
-REACT_APP_WS_URL=wss://chathub.onrender.com
+REACT_APP_API_URL=https://backend-api-url.com
+REACT_APP_WS_URL=wss://backend-api-url.com
 ```
 
 **4. Run the Application**
